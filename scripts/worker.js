@@ -1,8 +1,20 @@
-const delay = require("yoctodelay");
-const Queue = require("bull");
+// NOTE: this event emmiter is here for a reason and it'd be best if we can avoid this
+require('events').EventEmitter.prototype._maxListeners = Infinity;
+require('dotenv').config()
 
-var delayQueue = new Queue("delay date");
-delayQueue
+const Queue = require("bull");
+const concurrency = 20;
+const scraper = require("./browser/index");
+
+var queue = new Queue("get content", {
+  redis: {
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+    password: process.env.REDIS_PASS
+  }
+});
+
+queue
   .on("completed", function(job, result) {
     // A job successfully completed with a `result`.
     console.log(result);
@@ -12,9 +24,17 @@ delayQueue
     console.log(err);
   });
 
-delayQueue.process(10000, async function(job) {
-  const startTime = new Date().toUTCString();
-  await delay(1000);
-  const endTime = new Date().toUTCString();
-  return { data: job.data, startTime, endTime };
+queue.process(concurrency, async function(job) {
+  try {
+    const response = await scraper(job.data);
+    return response;
+  } catch (e) {
+    return { error: "error processing task" };
+  }
 });
+
+// Graceful shutdown
+const shutter = require('./shutter');
+process.on('SIGTERM', function onSigterm () {
+  shutter(queue);
+})
