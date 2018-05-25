@@ -1,3 +1,4 @@
+require("dotenv").config();
 const puppeteer = require("puppeteer");
 const normalizeUrl = require("normalize-url");
 
@@ -42,8 +43,9 @@ class Scrapper {
       "--no-zygote",
       "--no-sandbox"
     ];
-    if (this.data.proxy) {
-      args.push(`--proxy-server=${this.data.proxy}`);
+    const proxy = this.data.proxy || process.env.DEFAULT_PROXY;
+    if (proxy) {
+      args.push(`--proxy-server=${proxy}`);
     }
     this.args = args;
     this.data.url = normalizeUrl(this.data.url);

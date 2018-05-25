@@ -3,13 +3,15 @@ module.exports = {
     {
       name: "master",
       script: "./scripts/api.js",
-      instances: 4,
-      watch: true
+      instances: "max",
+      watch: true,
+      exec_mode: "cluster"
     },
     {
       name: "worker",
       script: "./scripts/worker.js",
-      instances: 4,
+      instances: "max",
+      watch: true,
       exec_mode: "cluster"
     }
   ]
