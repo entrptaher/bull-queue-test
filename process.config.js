@@ -5,14 +5,14 @@ module.exports = {
     {
       name: "master",
       script: "./scripts/api.js",
-      instances: process.env.MAX_WORKER_PROCESS || 1,
+      instances: 1,
       watch: true,
       exec_mode: "cluster"
     },
     {
       name: "worker",
       script: "./scripts/worker.js",
-      instances: process.env.MAX_WORKER_PROCESS || 1,
+      instances: 1,
       watch: true,
       exec_mode: "cluster"
     }

@@ -3,7 +3,7 @@ require('events').EventEmitter.prototype._maxListeners = Infinity;
 require('dotenv').config()
 
 const Queue = require("bull");
-const concurrency = process.env.CONCURRENCY_PER_PROCESS || 5;
+const concurrency = parseInt(process.env.CONCURRENCY_PER_PROCESS) || 5;
 const scraper = require("./browser/index");
 
 var queue = new Queue("get content", {
